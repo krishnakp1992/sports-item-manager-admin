@@ -67,7 +67,7 @@ async def admins(
 
 @app.post('/sportsgear/create', response_model=SchemaListSportsGear)
 async def create_sports_gear(sports_gear: SchemaCreateSportsGear, current_user: User = Depends(get_current_active_admin)):
-    db_sports_gear = SportsGear(name=sports_gear.name, sport=sports_gear.sport, available_count = sports_gear.available_count, user_id=current_user.id)
+    db_sports_gear = SportsGear(name=sports_gear.name, sport=sports_gear.sport, available_count = sports_gear.available_count, user_id=current_user.id, rent_per_day=sports_gear.rent_per_day)
     db.session.add(db_sports_gear)
     db.session.commit()
     return db_sports_gear
