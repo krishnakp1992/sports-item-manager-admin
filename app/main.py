@@ -77,8 +77,8 @@ async def create_sports_gear(sports_gear: SchemaCreateSportsGear, current_user: 
 async def sports_gears(
     current_user: User = Depends(get_current_active_admin)
 ):
-    author = db.session.query(SportsGear).all()
-    return author
+    sports_gears = db.session.query(SportsGear).all()
+    return sports_gears
 
 
 @app.patch('/sportsgear/{sports_gear_id}/update', response_model=SchemaListSportsGear)
