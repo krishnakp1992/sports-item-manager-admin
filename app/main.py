@@ -7,7 +7,7 @@ from fastapi_sqlalchemy import DBSessionMiddleware, db
 from sgor_core.schemas.admin_schema import CreateSportsGear as SchemaCreateSportsGear, CreateUser as SchemaCreateAdmin, ListUser as SchemaListUser, \
 UpdateSportsGear as SchemaUpdateSportsGear, ListSportsGear as SchemaListSportsGear
 from sgor_core.schemas.auth_schema import Token
-from sgor_core.models import SportsGear, User
+from sgor_core.models import SportsGear, User, UserRental
 
 from sgor_core.utils import check_if_user_exists
 from sgor_core.auth import get_password_hash, authenticate_user, ACCESS_TOKEN_EXPIRE_MINUTES, create_access_token, get_current_active_admin
@@ -105,6 +105,21 @@ async def delete_sports_gear(
         db.session.delete(sports_gear_obj)
         db.session.commit()
     return {'status': 'success'}
+
+@app.get('/user/pending-rentals')
+async def user_pending_rentals(
+    current_user: User = Depends(get_current_active_admin)
+):
+    rentals = db.session.query(UserRental).filter(UserRental.rental_end_date.is_(None)).order_by(UserRental.rental_started.desc())
+    return [rental.serialize() for rental in rentals]
+
+@app.get('/user/completed-rentals')
+async def user_completed_rentals(
+    current_user: User = Depends(get_current_active_admin)
+):
+    rentals = db.session.query(UserRental).filter(UserRental.rental_end_date.isnot(None)).order_by(UserRental.rental_started.desc())
+    return [rental.serialize() for rental in rentals]
+
 
 # # To run locally
 # if __name__ == '__main__':
